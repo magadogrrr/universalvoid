@@ -3,18 +3,17 @@ package org.torrenzo;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.Camera;
-import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 /**
@@ -25,7 +24,8 @@ public class App extends Application {
     public static final float WIDTH = 1400;
     public static final float HEIGHT = 1000;
     public static final String SCENE_TITLE = "GritsAintGroceries";
-    public static final String rusty_tile = "/Wood-100.jpg";
+    public static final String woodTexturePath = "/Wood-100.jpg";
+    public static final String waterTexturePath = "/Water.jpg";
 
     private double anchorX, anchorY = 0;
     private double anchorAngleX, anchorAngleY = 0;
@@ -37,10 +37,9 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
 
-        Box box = createBoxResource();
-
         SmartGroup group = new SmartGroup();
-        group.getChildren().add(box);
+        group.getChildren().add(createBoxResource());
+        group.getChildren().addAll(prepareLightSource());
 
         Camera camera = new PerspectiveCamera();
         Scene scene = new Scene(group, WIDTH, HEIGHT);
@@ -83,14 +82,30 @@ public class App extends Application {
         stage.show();
     }
 
+    private Node[] prepareLightSource() {
+        //AmbientLight ambientLight = new AmbientLight();
+        //ambientLight.setColor(Color.DEEPSKYBLUE);
+        // ambientLight.setColor(Color.ROSYBROWN);
+        //   return ambientLight;
+
+        PointLight pointLight = new PointLight();
+        pointLight.setColor(Color.FLORALWHITE);
+        pointLight.getTransforms().add(new Translate(0,-50,100));
+
+        Sphere soulOfLight = new Sphere(2);
+        soulOfLight.getTransforms().setAll(pointLight.getTransforms());
+        return new Node[]{pointLight, soulOfLight};
+    }
+
     private Box createBoxResource() {
 
         Box box = new Box(100,20,50);
 
         PhongMaterial boxMaterial = new PhongMaterial();
         try {
-            Image rustyTile = new Image(getClass().getResourceAsStream(rusty_tile));
-            boxMaterial.setDiffuseMap(rustyTile);
+            Image waterTexture = new Image(getClass().getResourceAsStream(waterTexturePath));
+            Image woodTexture = new Image(getClass().getResourceAsStream(woodTexturePath));
+            boxMaterial.setDiffuseMap(woodTexture);
             box.setMaterial(boxMaterial);
             System.out.println("diffuse map!");
 
